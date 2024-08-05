@@ -10,18 +10,16 @@
       (some-> hmap :stop str (str/includes? "this"))
       (update :stop wrap-stop-fn))))
 
-(defrecord IState [])
-
 (defmacro defstate [name & args]
   (let [args (cond->> args (string? (first args)) rest)
         args (cond->> args (map? (first args)) rest)
         hmap (exprs-map args)]
     (when-not (contains? hmap :start)
       (throw (ex-info "missing :start expression" {})))
-    `(def ~name ~(map->IState hmap))))
+    `(def ~name (mount.lite/map->State ~hmap))))
 
 (defmacro state [& args]
   (let [hmap (exprs-map args)]
     (when-not (contains? hmap :start)
       (throw (ex-info "missing :start expression" {})))
-    (map->IState hmap)))
+    `(mount.lite/map->State ~hmap)))
